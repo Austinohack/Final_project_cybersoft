@@ -5,11 +5,11 @@ from constants import revenue_daily, revenue_6m, top_products
 from feature.utils import check_session, vnd, fmt_table, filter_products
 from feature.UI import render_sidebar
 
-# =========================
-# CẤU HÌNH & DỮ LIỆU GIẢ
-# =========================
+# ===================
+# CẤU HÌNH & DỮ LIỆU 
+# ===================
 st.set_page_config(
-    page_title="Bảng điều khiển doanh thu cửa hàng", layout="wide")
+    page_title="Sell dashboard movies", layout="wide")
 st.markdown("""
 <style>
 div[data-testid="stSidebarNav"] { display: none; }
@@ -17,17 +17,14 @@ div[data-testid="stSidebarNav"] { display: none; }
 """, unsafe_allow_html=True)
 
 check_session()
-tong_doanh_thu = 856_000_000
-so_don_hang = 1_254
-khach_moi = 327
-so_sp_ban_ra = 15_430
+
 
 
 # 14 ngày gần nhất
-days = [date.today() - timedelta(days=13 - i) for i in range(14)]
-days_lbl = [d.strftime("%d/%m") for d in days]
+days = []
+days_lbl = []
 
-revenue_daily = [x * 1_000_000 for x in revenue_daily]
+revenue_daily = []
 
 
 def prev_months(n: int):
@@ -44,13 +41,13 @@ def prev_months(n: int):
 
 
 ym = prev_months(9)
-months_lbl = [f"{m:02d}/{y}" for (y, m) in ym]
-revenue_6m = [x * 1_000_000 for x in revenue_6m]
+months_lbl = []
+revenue_6m = []
 
 # =========================
 # UI
 # =========================
-st.title("📊 BẢNG ĐIỀU KHIỂN DOANH THU CỬA HÀNG")
+st.title("📊 SELL DASHBOARD MOVIES")
 st.caption("Theo dõi doanh thu, đơn hàng, khách hàng và sản phẩm bán chạy.")
 
 render_sidebar(st)
@@ -59,19 +56,16 @@ render_sidebar(st)
 c1, c2, c3, c4 = st.columns(4)
 with c1:
     st.subheader("Doanh thu tháng này")
-    st.metric(label="", value=vnd(tong_doanh_thu), delta="+2.1%")
+    # st.metric(label="", value=vnd(tong_doanh_thu), delta="+2.1%")
     st.link_button("Xem chi tiết doanh thu", "#")
 with c2:
     st.subheader("Đơn hàng")
-    st.metric(label="", value=f"{so_don_hang:,}".replace(",", "."))
     st.link_button("Xem chi tiết đơn hàng", "#")
 with c3:
     st.subheader("Khách hàng mới")
-    st.metric(label="", value=f"{khach_moi:,}".replace(",", "."), delta="+5%")
     st.link_button("Xem chi tiết KH", "#")
 with c4:
     st.subheader("Sản phẩm bán ra")
-    st.metric(label="", value=f"{so_sp_ban_ra:,}".replace(",", "."))
     st.link_button("Xem sản phẩm chi tiết", "#")
 
 st.divider()
@@ -80,8 +74,9 @@ c1, c2 = st.columns(2)
 with c1:
     # Biểu đồ doanh thu theo ngày (Vega-Lite – có sẵn trong Streamlit)
     st.subheader("📈 Biểu đồ doanh thu theo ngày")
-    data_daily = [{"Ngày": d, "Doanh thu": v}
-                  for d, v in zip(days_lbl, revenue_daily)]
+    # data_daily = [{"Ngày": d, "Doanh thu": v}
+    #               for d, v in zip(days_lbl, revenue_daily)]
+    data_daily = []
     st.vega_lite_chart(
         data_daily,
         {
