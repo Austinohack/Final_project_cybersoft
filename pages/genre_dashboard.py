@@ -4,9 +4,14 @@ import glob
 import os
 import shutil
 from feature.UI import render_sidebar
+import matplotlib.ticker as mticker
+import seaborn as sns
+import matplotlib.pyplot as plt
+import streamlit as st
+import altair as alt
 
 st.set_page_config(page_title="Genres Dashboard", layout="wide")
-st.title("🎬 Movie Genres Dashboard — Diagnostics Enabled")
+st.title("🎬 Movie Genres Dashboard")
 
 st.success("Dashboard loaded successfully!")
 
@@ -94,24 +99,58 @@ except Exception as e:
                 st.error(f"Copy failed: {e2}")
     st.stop()
 
+
+
+
+
+
 # ---- Normal dashboard UI ----
 st.header(f"📂 {selected_genre} Movies")
 st.write(f"`{os.path.basename(file_path)}` (rows: {len(df)})")
+st.subheader("📈 Numeric Column Distributions")
+
+c1, c2= st.columns(2)
+with c1:
+    # Simple numeric visualization if available
+    numeric_cols = df.select_dtypes(include=["number"]).columns.tolist()
+    if numeric_cols:
+        selected_col = st.selectbox("Choose a numeric column to visualize:", numeric_cols)
+        st.bar_chart(df[selected_col])
+    else:
+        st.info("No numeric columns detected for visualization.")
+with c2:
+    chart = (
+        alt.Chart(df)
+        .mark_circle(size=60)
+        .encode(
+            x=alt.X("score", title="Score"),
+            y=alt.Y("budget", title="Budget (VND)"),
+            tooltip=[
+                alt.Tooltip("name", title="name"),
+                alt.Tooltip("score", title="Score"),
+                alt.Tooltip("budget", title="Budget (VND)", format=",.0f")  # 👈 format budget nicely
+            ]
+
+        )
+        .properties(
+            title="Correlation Between Budget and Score",
+            height=500
+        )
+        .interactive()
+    )
+
+    st.altair_chart(chart, use_container_width=True)
+
+
+    # plt.show()
 
 st.subheader("📊 Summary Statistics")
 st.dataframe(df.describe(include="all"))
 
-st.subheader("📋 Data Preview")
-st.dataframe(df.head())
+# st.subheader("📋 Data Preview")
+st.dataframe(df.head(), hide_index=True)
 
-# Simple numeric visualization if available
-numeric_cols = df.select_dtypes(include=["number"]).columns.tolist()
-if numeric_cols:
-    st.subheader("📈 Numeric Column Distributions")
-    selected_col = st.selectbox("Choose a numeric column to visualize:", numeric_cols)
-    st.bar_chart(df[selected_col])
-else:
-    st.info("No numeric columns detected for visualization.")
+
 
 # Download options
 st.subheader("⬇ Download Options")
@@ -129,6 +168,10 @@ with open(file_path, "rb") as f:
         file_name=os.path.basename(file_path),
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+
+
+
+
 
 
 
