@@ -111,13 +111,37 @@ st.subheader("📈 Numeric Column Distributions")
 
 c1, c2= st.columns(2)
 with c1:
-    # Simple numeric visualization if available
-    numeric_cols = df.select_dtypes(include=["number"]).columns.tolist()
-    if numeric_cols:
-        selected_col = st.selectbox("Choose a numeric column to visualize:", numeric_cols)
-        st.bar_chart(df[selected_col])
+# --- Only 3 visualization options ---
+    options = [
+        "ROI by year",
+        "CPM by year",
+        "Engagement by year"
+    ]
+
+
+    choice = st.selectbox("Choose a metric to visualize:", options)
+
+    # Map user choice → actual dataframe column
+    metric_map = {
+        "ROI by year": "ROI",
+        "CPM by year": "CPM",
+        "Engagement by year": "Engagement"
+    }
+
+    metric_column = metric_map[choice]
+
+    # --- Plot the selected metric ---
+    if "year" in df.columns:
+        chart_data = df.groupby("year")[metric_column].mean().reset_index()
+
+        st.line_chart(
+            chart_data,
+            x="year",
+            y=metric_column
+        )
     else:
-        st.info("No numeric columns detected for visualization.")
+        st.error("Column 'year' not found in dataset.")
+
 with c2:
     chart = (
         alt.Chart(df)
@@ -141,11 +165,63 @@ with c2:
 
     st.altair_chart(chart, use_container_width=True)
 
+# Infer genre from filename
+df["genre"] = selected_genre
+
+st.subheader("📊 ROI Comparison")
+
+# ---------- ROI by Genre (current dataset) ----------
+if "ROI" in df.columns:
+    roi_genre = (
+        df.groupby("genre", as_index=False)["ROI"]
+        .mean()
+        .sort_values("ROI", ascending=False)
+    )
+
+    st.metric(
+    label="🎭 Average ROI (This Genre)",
+    value=f"{df['ROI'].mean():.2f}"
+)
+else:
+    st.warning("ROI column not found.")
+
+
+
+
 
     # plt.show()
 
 st.subheader("📊 Summary Statistics")
-st.dataframe(df.describe(include="all"))
+
+num_cols = df.select_dtypes(include="number")
+cat_cols = df.select_dtypes(exclude="number")
+
+# --- Numeric Summary ---
+st.markdown("### 🔢 Numeric Columns")
+if not num_cols.empty:
+    st.dataframe(
+        num_cols.describe().T,
+        use_container_width=True
+    )
+else:
+    st.info("No numeric columns available.")
+
+# --- Categorical Summary ---
+st.markdown("### 🏷 Categorical Columns")
+if not cat_cols.empty:
+    cat_summary = pd.DataFrame({
+        "Unique values": cat_cols.nunique(),
+        "Most frequent": cat_cols.mode().iloc[0],
+        "Missing values": cat_cols.isna().sum()
+    })
+    st.dataframe(
+        cat_summary,
+        use_container_width=True
+    )
+else:
+    st.info("No categorical columns available.")
+
+
 
 # st.subheader("📋 Data Preview")
 st.dataframe(df.head(), hide_index=True)
