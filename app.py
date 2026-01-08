@@ -9,6 +9,9 @@ import os
 import glob
 import shutil
 
+
+
+
 # ===================
 # CẤU HÌNH & DỮ LIỆU 
 # ===================
@@ -69,7 +72,7 @@ if not found_files:
 # Build genre list from filenames (basename without ext)
 genre_list = [os.path.splitext(os.path.basename(p))[0] for p in found_files]
 
-selected_genre = st.sidebar("Select Genre", genre_list)
+selected_genre = genre_list[0]
 
 # Map selected genre to absolute path
 selected_index = genre_list.index(selected_genre)
@@ -94,6 +97,7 @@ except Exception as e:
             except Exception as e2:
                 st.error(f"Copy failed: {e2}")
     st.stop()
+
 
 
 # 14 ngày gần nhất
@@ -166,6 +170,7 @@ st.divider()
 
 c1, c2 = st.columns(2)
 with c1:
+    st.subheader("📊 Summary Statistics")
 # ---------- ROI by Country ----------
     if "country" in df.columns and "ROI" in df.columns:
         roi_country = (
@@ -211,3 +216,5 @@ keyword = st.text_input("🔎 Tìm sản phẩm:")
 
 filtered = filter_products(top_products, keyword)
 st.table(fmt_table(filtered))
+
+
