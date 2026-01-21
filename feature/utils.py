@@ -2,40 +2,12 @@
 import pandas as pd
 import glob
 import os
-import streamlit as st
+
 
 key = "products"
 
 
-# def check_session():
-#     if key not in st.session_state:
-#         st.session_state[key] = top_products
 
-#     print(f"State with {key} is ready.")
-
-
-# def vnd(x: int | float) -> str:
-#     return f"{x:,}".replace(",", ".") + " VND"
-
-
-# def filter_products(items: list[dict], q: str) -> list[dict]:
-#     if not q:
-#         return items
-#     q = q.strip().lower()
-#     return [it for it in items if q in it["Tên sản phẩm"].lower()]
-
-
-# def fmt_table(items: list[dict]) -> list[dict]:
-#     rows = []
-#     for it in items:
-#         rows.append({
-#             "Tên sản phẩm": it["Tên sản phẩm"],
-#             "Số lượng bán": f'{it["Số lượng bán"]:,}'.replace(",", "."),
-#             "Danh mục": it["Danh mục"],
-#             "Giá bán (VND)": f'{it["Giá bán (VND)"]:,}'.replace(",", "."),
-#             "Tình trạng": it["Tình trạng"],
-#         })
-#     return rows
 
 def load_movies_data(path: str) -> pd.DataFrame:
     """
@@ -75,3 +47,34 @@ def load_movies_data(path: str) -> pd.DataFrame:
         dfs.append(df)
 
     return pd.concat(dfs, ignore_index=True)
+
+
+MOVIE_PATH = "data/clean/movies_clean.csv"
+
+
+def load_movies():
+    return pd.read_csv(MOVIE_PATH)
+
+
+def save_movies(df: pd.DataFrame):
+    df.to_csv(MOVIE_PATH, index=False)
+
+
+def create_movie(movie: dict):
+    df = load_movies()
+    df = pd.concat([df, pd.DataFrame([movie])], ignore_index=True)
+    save_movies(df)
+
+
+def update_movie(index: int, updated_movie: dict):
+    df = load_movies()
+    for col, val in updated_movie.items():
+        df.at[index, col] = val
+    save_movies(df)
+
+
+def delete_movie(index: int):
+    df = load_movies()
+    df = df.drop(index).reset_index(drop=True)
+    save_movies(df)
+
