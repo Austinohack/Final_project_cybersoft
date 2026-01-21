@@ -55,6 +55,8 @@ with st.form("create_movie"):
 # =========================
 # UPDATE
 # =========================
+st.header("✏️ Update Movie")
+
 df = load_movies()
 
 # this creates idx
