@@ -55,14 +55,15 @@ with st.form("create_movie"):
 # =========================
 # UPDATE
 # =========================
-st.divider()
-st.header("✏️ Update Movie")
+df = load_movies()
 
+# this creates idx
 idx = st.selectbox(
-    "Select movie",
-    df.index,
+    "Select movie to update",
+    df.index.tolist(),
     format_func=lambda i: df.loc[i, "title"]
 )
+
 
 with st.form("update_movie"):
     title = st.text_input("Title", df.loc[idx, "title"])
@@ -82,11 +83,31 @@ with st.form("update_movie"):
     runtime = st.number_input("Runtime", value=int(df.loc[idx, "runtime"]))
     segment = st.text_input("Segment", df.loc[idx, "segment"])
 
-    update = st.form_submit_button("Update")
+    update_clicked = st.form_submit_button("Update")
 
-    if update:
-        update_movie(idx, locals())
-        st.success("Movie updated!")
+    if update_clicked:
+        update_movie(
+            idx,
+            {
+                "title": title,
+                "rating": rating,
+                "genre": genre,
+                "year": year,
+                "released": released,
+                "score": score,
+                "votes": votes,
+                "director": director,
+                "writer": writer,
+                "star": star,
+                "country": country,
+                "budget": budget,
+                "gross": gross,
+                "company": company,
+                "runtime": runtime,
+                "segment": segment,
+            }
+        )
+        st.success("Movie updated correctly ✅")
         st.rerun()
 
 # =========================
