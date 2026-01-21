@@ -30,7 +30,8 @@ with st.form("create_movie"):
 
     submit = st.form_submit_button("Create")
 
-    if submit:
+if submit:
+    try:
         create_movie({
             "title": title,
             "rating": rating,
@@ -47,10 +48,14 @@ with st.form("create_movie"):
             "gross": gross,
             "company": company,
             "runtime": runtime,
-            "segment": segment
+            "segment": segment,
         })
-        st.success("Movie created!")
+        st.success("Movie created 🎉")
         st.rerun()
+
+    except ValueError as e:
+        st.error(str(e))
+
 
 # =========================
 # UPDATE

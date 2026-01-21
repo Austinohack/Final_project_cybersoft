@@ -1,4 +1,3 @@
-
 import pandas as pd
 import glob
 import os
@@ -62,8 +61,19 @@ def save_movies(df: pd.DataFrame):
 
 def create_movie(movie: dict):
     df = load_movies()
+
+    # Duplicate rule: same title + year
+    duplicate = df[
+        (df["title"].str.lower() == movie["title"].lower())
+        & (df["year"] == movie["year"])
+    ]
+
+    if not duplicate.empty:
+        raise ValueError("Movie already exists")
+
     df = pd.concat([df, pd.DataFrame([movie])], ignore_index=True)
     save_movies(df)
+
 
 
 def update_movie(index: int, updated_movie: dict):
