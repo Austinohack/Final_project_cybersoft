@@ -51,7 +51,7 @@ if submit:
             "segment": segment,
         })
         st.success("Movie created 🎉")
-        st.rerun()
+        
 
     except ValueError as e:
         st.error(str(e))
@@ -115,7 +115,7 @@ with st.form("update_movie"):
             }
         )
         st.success("Movie updated correctly ✅")
-        st.rerun()
+        
 
 # =========================
 # DELETE
@@ -133,4 +133,4 @@ del_idx = st.selectbox(
 if st.button("Delete"):
     delete_movie(del_idx)
     st.warning("Movie deleted!")
-    st.rerun()
+    
